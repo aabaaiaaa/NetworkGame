@@ -6,6 +6,7 @@ Packet = function(args){
 	var destinationServer = null;
 	var currentServer = originServer;
 	var nextServer = null;
+	var visitedServers = [];
 
 	//public methods
 	this.setType = function(packetType){
@@ -24,21 +25,44 @@ Packet = function(args){
 			$.each(servers, function(index, server){
 				if(server == destinationServer) {
 					setTimeout((function(){
-						console.log("Reached destination: " + destinationServer.getName());
+						console.log("Reached destination: " + destinationServer.getName() + " / " + payload);
 					}).bind(this), 2000);
 					destinationServerIdentified = true;
 					return false;
 				}
 			});
 			if(!destinationServerIdentified){
+				var nextServer = getNextUnvisitedServer(servers);
+				if(nextServer != null) {
+					addVisitedServer(nextServer);
+				} else {
+					nextServer = servers[0];
+				}
 				setTimeout((function(){
-					console.log(currentServer.getName() + " > " + servers[0].getName());
-					currentServer = servers[0];
+					console.log(currentServer.getName() + " > " + nextServer.getName() + " / " + payload);
+					currentServer = nextServer;
 					this.send();
 				}).bind(this), 2000);
 			}
 		}
 	};
+
+	//private methods
+	var addVisitedServer = function(targetServer){
+		visitedServers.push(targetServer);
+	};
+	var getNextUnvisitedServer = function(servers){
+		var nextServer = null;
+		$.each(servers, function(index, server){
+			if($.inArray(server, visitedServers) == -1){
+				nextServer = server;
+				return false;
+			}
+		});
+		return nextServer;
+	};
+
+
 	// this.type = args.type;
 	// this.nicDestination = args.destination;
 	// this.nicOrigin = args.nic;

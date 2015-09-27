@@ -36,12 +36,13 @@ app = new (function(){
 					server: this.getServer()
 				});
 				testPacket.setType("TCP");
-				testPacket.setPayload("test message");
+				testPacket.setPayload(args.data);
 				testPacket.setDestinationServer(args.destinationServer);
 				testPacket.send();
 			});
 			aSoftware.run({
-				destinationServer: b
+				destinationServer: b,
+				data: "data for server B"
 			});
 			console.log("test 2 complete");
 
@@ -53,7 +54,8 @@ app = new (function(){
 			var cNic = c.addHardware(new Nic());
 			bNic2.setConnection(cNic);
 			aSoftware.run({
-				destinationServer: c
+				destinationServer: c,
+				data: "data for server C"
 			});
 			console.log("test 3 complete");
 
@@ -65,9 +67,42 @@ app = new (function(){
 			var dNic = d.addHardware(new Nic());
 			cNic2.setConnection(dNic);
 			aSoftware.run({
-				destinationServer: d
+				destinationServer: d,
+				data: "data for server D"
 			});
 			console.log("test 4 complete");
+
+
+			var bNic3 = b.addHardware(new Nic());
+			var e = addServer({
+				name: "E"
+			});
+			var eNic = e.addHardware(new Nic());
+			bNic3.setConnection(eNic);
+			var eNic2 = e.addHardware(new Nic());
+			var f = addServer({
+				name: "F"
+			});
+			var fNic = f.addHardware(new Nic());
+			eNic2.setConnection(fNic);
+			aSoftware.run({
+				destinationServer: f,
+				data: "missing data for F - URGENT!"
+			});
+			console.log("test 5 complete");
+
+
+			var cNic3 = c.addHardware(new Nic());
+			var g = addServer({
+				name: "G"
+			});
+			var gNic = g.addHardware(new Nic());
+			cNic3.setConnection(gNic);
+			aSoftware.run({
+				destinationServer: g,
+				data: "Find G quick!"
+			});
+			console.log("test 6 complete");
 		}
 	};
 
