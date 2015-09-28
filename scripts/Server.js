@@ -25,6 +25,17 @@ Server = function(args){
 	this.getName = function(){
 		return name;
 	};
+	this.inboundPacket = function(packet){
+		if(packet.needsResponse()){
+			var responsePacket = new Packet({
+				server: this
+			});
+			responsePacket.setType("ACK");
+			responsePacket.setPayload("ACK");
+			responsePacket.setDestinationServer(packet.getOriginServer());
+			responsePacket.send();
+		}
+	};
 
 	//private methods
 	var listNics = function(){

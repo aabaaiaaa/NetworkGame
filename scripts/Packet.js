@@ -19,19 +19,22 @@ Packet = function(args){
 		destinationServer = targetServer;
 	};
 	this.send = function(){
+		addVisitedServer(originServer);
 		var servers = currentServer.listConnectedServers();
 		if(servers.length > 0){
 			var destinationServerIdentified = false;
 			$.each(servers, function(index, server){
 				if(server == destinationServer) {
-					setTimeout((function(){
-						console.log("Reached destination: " + destinationServer.getName() + " / " + payload);
-					}).bind(this), 2000);
 					destinationServerIdentified = true;
 					return false;
 				}
 			});
-			if(!destinationServerIdentified){
+			if(destinationServerIdentified){
+				setTimeout((function(){
+					console.log("Reached destination: " + destinationServer.getName() + " / " + payload);
+					destinationServer.inboundPacket(this);
+				}).bind(this), 2000);
+			} else {
 				var nextServer = getNextUnvisitedServer(servers);
 				if(nextServer != null) {
 					addVisitedServer(nextServer);
@@ -45,6 +48,12 @@ Packet = function(args){
 				}).bind(this), 2000);
 			}
 		}
+	};
+	this.needsResponse = function(){
+		return (type == "TCP");
+	};
+	this.getOriginServer = function(){
+		return originServer;
 	};
 
 	//private methods
